@@ -48,31 +48,36 @@ public class ImageCleanupTask extends Thread {
   @Override
   public void run() {
     Camera.CameraInfo info=new Camera.CameraInfo();
-
     Camera.getCameraInfo(cameraId, info);
 
-    Matrix matrix=null;
+    DeviceProfile profile=xact.host.getDeviceProfile();
+    
+    Matrix matrix=new Matrix();
     Bitmap cleaned=null;
-    ExifInterface exif=null;
+    ExifInterface exif;
 
     if (applyMatrix) {
       if (info.facing == Camera.CameraInfo.CAMERA_FACING_FRONT) {
-        if (xact.host.getDeviceProfile().portraitFFCFlipped()
+        if (profile.portraitFFCFlipped()
             && (xact.displayOrientation == 90 || xact.displayOrientation == 270)) {
-          matrix=flip(new Matrix());
+          matrix.postScale(-1.0f, -1.0f);  // flip
         }
         else if (xact.mirrorFFC()) {
-          matrix=mirror(new Matrix());
+          matrix.postScale(-1.0f, 1.0f);  // mirror X axis
         }
       }
 
-      try {
-        int imageOrientation=0;
+      boolean useDeviceRotation=profile.useDeviceOrientation();
+      boolean useExifRotation=profile.useExifInfo();
 
-        if (xact.host.getDeviceProfile().useDeviceOrientation()) {
-          imageOrientation=xact.displayOrientation;
-        }
-        else {
+      int angleDevice=0;
+      int angleExif=0;
+
+      if (useDeviceRotation) {
+        angleDevice=xact.displayOrientation;
+      }
+      if (useExifRotation) {
+        try {
           exif=new ExifInterface();
           exif.readExif(data);
 
@@ -81,43 +86,47 @@ public class ImageCleanupTask extends Thread {
 
           if (exifOrientation != null) {
             if (exifOrientation == 6) {
-              imageOrientation=90;
+              angleExif=90;
             }
             else if (exifOrientation == 8) {
-              imageOrientation=270;
+              angleExif=270;
             }
             else if (exifOrientation == 3) {
-              imageOrientation=180;
+              angleExif=180;
             }
             else if (exifOrientation == 1) {
-              imageOrientation=0;
+              angleExif=0;
             }
             else {
-              // imageOrientation=
-              // xact.host.getDeviceProfile().getDefaultOrientation();
+              // angleExif=profile.getDefaultOrientation();
               //
-              // if (imageOrientation == -1) {
-              // imageOrientation=xact.displayOrientation;
+              // if (angleExif == -1) {
+              // angleExif=xact.displayOrientation;
               // }
             }
           }
         }
-
-        if (imageOrientation != 0) {
-          matrix=
-              rotate((matrix == null ? new Matrix() : matrix),
-                     imageOrientation);
+        catch (IOException e) {
+          Log.e("CWAC-Camera", "Exception parsing JPEG", e);
+          // TODO: ripple to client
         }
       }
-      catch (IOException e) {
-        Log.e("CWAC-Camera", "Exception parsing JPEG", e);
-        // TODO: ripple to client
+
+      if (useDeviceRotation) {
+        matrix.preRotate(angleDevice);
+      }
+      if (useExifRotation) {
+        matrix.preRotate(angleExif);
       }
 
-      if (matrix != null) {
+      Matrix postProcess=xact.host.getPostProcessingMatrix(angleDevice, angleExif);
+      if (postProcess != null) {
+        matrix.postConcat(postProcess);
+      }
+
+      if (!matrix.isIdentity()) {
         Bitmap original=
             BitmapFactory.decodeByteArray(data, 0, data.length);
-
         cleaned=
             Bitmap.createBitmap(original, 0, 0, original.getWidth(),
                                 original.getHeight(), matrix, true);
@@ -134,7 +143,7 @@ public class ImageCleanupTask extends Thread {
     }
 
     if (xact.needByteArray) {
-      if (matrix != null) {
+      if (!matrix.isIdentity()) {
         ByteArrayOutputStream out=new ByteArrayOutputStream();
 
         // if (exif == null) {
@@ -167,35 +176,6 @@ public class ImageCleanupTask extends Thread {
     }
 
     System.gc();
-  }
-
-  // from http://stackoverflow.com/a/8347956/115145
-
-  private Matrix mirror(Matrix input) {
-    float[] mirrorY= { -1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    Matrix matrixMirrorY=new Matrix();
-
-    matrixMirrorY.setValues(mirrorY);
-    input.postConcat(matrixMirrorY);
-
-    return(input);
-  }
-
-  private Matrix flip(Matrix input) {
-    float[] mirrorY= { -1, 0, 0, 0, 1, 0, 0, 0, 1 };
-    Matrix matrixMirrorY=new Matrix();
-
-    matrixMirrorY.setValues(mirrorY);
-    input.preScale(1.0f, -1.0f);
-    input.postConcat(matrixMirrorY);
-
-    return(input);
-  }
-
-  private Matrix rotate(Matrix input, int degree) {
-    input.setRotate(degree);
-
-    return(input);
   }
 
   @TargetApi(Build.VERSION_CODES.HONEYCOMB)

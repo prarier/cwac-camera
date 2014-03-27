@@ -35,6 +35,8 @@ abstract public class DeviceProfile {
 
   abstract public boolean useDeviceOrientation();
 
+  abstract public boolean useExifInfo();
+
   abstract public int getPictureDelay();
 
   abstract public RecordingHint getDefaultRecordingHint();

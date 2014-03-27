@@ -150,6 +150,11 @@ public class SimpleDeviceProfile extends DeviceProfile {
     return(useDeviceOrientation);
   }
 
+  @Override
+  public boolean useExifInfo() {
+    return(!useDeviceOrientation());
+  }
+
   // for devices like Galaxy Nexus where delaying
   // taking a picture after modifying Camera.Parameters
   // seems to help

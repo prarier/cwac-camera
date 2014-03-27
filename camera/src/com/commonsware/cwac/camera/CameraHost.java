@@ -15,6 +15,7 @@
 package com.commonsware.cwac.camera;
 
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.media.MediaRecorder;
 
@@ -274,4 +275,6 @@ public interface CameraHost extends Camera.AutoFocusCallback {
   boolean useFullBleedPreview();
   
   float maxPictureCleanupHeapUsage();
+
+  Matrix getPostProcessingMatrix(int angleDevice, int angleExif);
 }

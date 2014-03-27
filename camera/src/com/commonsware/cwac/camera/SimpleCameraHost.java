@@ -17,6 +17,7 @@ package com.commonsware.cwac.camera;
 import android.annotation.TargetApi;
 import android.content.Context;
 import android.graphics.Bitmap;
+import android.graphics.Matrix;
 import android.hardware.Camera;
 import android.media.CamcorderProfile;
 import android.media.MediaActionSound;
@@ -282,6 +283,11 @@ public class SimpleCameraHost implements CameraHost {
   @Override
   public float maxPictureCleanupHeapUsage() {
     return(1.0f);
+  }
+
+  @Override
+  public Matrix getPostProcessingMatrix(int angleDevice, int angleExif) {
+    return(null);
   }
   
   protected File getPhotoPath() {
