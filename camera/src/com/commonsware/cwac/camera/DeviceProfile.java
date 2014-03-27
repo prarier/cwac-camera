@@ -47,8 +47,7 @@ abstract public class DeviceProfile {
 //       String.format("\"%s\" \"%s\"", Build.MANUFACTURER,
 //       Build.PRODUCT));
 
-      if ("motorola".equalsIgnoreCase(Build.MANUFACTURER)
-          && "XT890_rtgb".equals(Build.PRODUCT)) {
+      if (isMotorolaRazrI()) {
         SINGLETON=new SimpleDeviceProfile.MotorolaRazrI();
       }
       else {
@@ -95,5 +94,13 @@ abstract public class DeviceProfile {
   // https://github.com/commonsguy/cwac-camera/issues/43#issuecomment-23791446
   public static boolean isCyanogenMod() {
     return(System.getProperty("os.version").contains("cyanogenmod") || Build.HOST.contains("cyanogenmod"));
+  }
+
+  public static boolean isMotorola() {
+    return("motorola".equalsIgnoreCase(Build.MANUFACTURER));
+  }
+
+  public static boolean isMotorolaRazrI() {
+    return(isMotorola() && "XT890_rtgb".equals(Build.PRODUCT));
   }
 }
