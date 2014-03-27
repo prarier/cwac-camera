@@ -1,6 +1,6 @@
 /***
   Copyright (c) 2013-2014 CommonsWare, LLC
-  
+
   Licensed under the Apache License, Version 2.0 (the "License"); you may
   not use this file except in compliance with the License. You may obtain
   a copy of the License at
@@ -36,7 +36,7 @@ abstract public class DeviceProfile {
   abstract public boolean useDeviceOrientation();
 
   abstract public int getPictureDelay();
-  
+
   abstract public RecordingHint getDefaultRecordingHint();
 
   private static volatile DeviceProfile SINGLETON=null;
@@ -94,6 +94,66 @@ abstract public class DeviceProfile {
   // https://github.com/commonsguy/cwac-camera/issues/43#issuecomment-23791446
   public static boolean isCyanogenMod() {
     return(System.getProperty("os.version").contains("cyanogenmod") || Build.HOST.contains("cyanogenmod"));
+  }
+
+  public static boolean isNexus3() {
+    return("takju".equals(Build.PRODUCT) || "yakju".equals(Build.PRODUCT));
+  }
+
+  public static boolean isNexus4() {
+    return("occam".equals(Build.PRODUCT));
+  }
+
+  public static boolean isAsus() {
+    return("asus".equalsIgnoreCase(Build.MANUFACTURER));
+  }
+
+  public static boolean isNexusSeven2012() {
+    return(isAsus() && "nakasi".equals(Build.PRODUCT));
+  }
+
+  public static boolean isHtc() {
+    return("HTC".equalsIgnoreCase(Build.MANUFACTURER));
+  }
+
+  public static boolean isHtcOne() {
+    return(isHtc() && "m7".equals(Build.PRODUCT));
+  }
+
+  public static boolean isSamsung() {
+    return("samsung".equalsIgnoreCase(Build.MANUFACTURER));
+  }
+
+  public static boolean isSamsungGalaxyS3() {
+    return(isSamsung() && ("d2att".equals(Build.PRODUCT) || "d2spr".equals(Build.PRODUCT)));
+  }
+
+  public static boolean isSamsungGalaxyS4Mini() {
+    return(isSamsung() && (
+        "serrano3gxx".equals(Build.PRODUCT) ||
+        "GT-I9190".equalsIgnoreCase(Build.MODEL) ||
+        "GT-I9195".equalsIgnoreCase(Build.MODEL)
+    ));
+  }
+
+  public static boolean isSamsungGalaxyTab2() {
+    return("espressowifiue".equals(Build.PRODUCT));
+  }
+
+  public static boolean isSamsungGalaxyCamera() {
+    return("gd1wifiue".equals(Build.PRODUCT));
+  }
+
+  public static boolean isSamsungGalaxyAce3() {
+    return("loganub".equals(Build.PRODUCT));
+  }
+
+  public static boolean isDroidIncredible2() {
+    return("htc_vivow".equalsIgnoreCase(Build.PRODUCT));
+  }
+
+  public static boolean isXperiaE() {
+    return("C1505_1271-7585".equalsIgnoreCase(Build.PRODUCT));
   }
 
   public static boolean isMotorola() {
