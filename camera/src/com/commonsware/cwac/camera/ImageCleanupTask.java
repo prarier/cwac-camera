@@ -104,6 +104,8 @@ public class ImageCleanupTask extends Thread {
               // angleExif=xact.displayOrientation;
               // }
             }
+          } else {
+            angleExif=-1;
           }
         }
         catch (IOException e) {
@@ -115,7 +117,7 @@ public class ImageCleanupTask extends Thread {
       if (useDeviceRotation) {
         matrix.preRotate(angleDevice);
       }
-      if (useExifRotation) {
+      if (useExifRotation && angleExif != -1) {
         matrix.preRotate(angleExif);
       }
 
