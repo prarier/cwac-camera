@@ -106,6 +106,10 @@ abstract public class DeviceProfile {
     return("occam".equals(Build.PRODUCT));
   }
 
+  public static boolean isNexus5() {
+    return("hammerhead".equals(Build.PRODUCT));
+  }
+
   public static boolean isAsus() {
     return("asus".equalsIgnoreCase(Build.MANUFACTURER));
   }
